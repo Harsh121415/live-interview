@@ -64,7 +64,7 @@ Build Virtual-Interview from source and install dependencies:
 1. **Clone the repository:**
 
    ```bash
-   git clone https://github.com/PravinSliet123/virtual-interview
+   git clone https://github.com/Harsh121415/virtual-interview
    ```
 
 2. **Install dependencies:**
