@@ -1,0 +1,73 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Company {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  email     String   @unique
+  logo      String?
+  credits   Int      @default(5)
+  createdAt DateTime @default(now())
+
+  interviews Interview[]
+  candidates Candidate[]
+}
+
+model Interview {
+  id             String @id @default(auto()) @map("_id") @db.ObjectId
+  companyId      String @db.ObjectId
+  title          String
+  questions      Json
+  duration       String
+  jobPosition    String
+  jobDescription String
+  interviewTypes Json
+
+  company  Company   @relation(fields: [companyId], references: [id])
+  attempts Attempt[]
+}
+
+model Candidate {
+  id        String  @id @default(auto()) @map("_id") @db.ObjectId
+  companyId String  @db.ObjectId
+  name      String
+  email     String  @unique
+  uniqueKey String  @unique // link identifier for login
+  profile   String?
+  isEnable  Boolean @default(true)
+
+  company  Company   @relation(fields: [companyId], references: [id])
+  attempts Attempt[]
+}
+
+model Attempt {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  candidateId String    @db.ObjectId
+  interviewId String    @db.ObjectId
+  response    Json?
+  callId      String?
+  transcript  String?
+  completed   Boolean   @default(false)
+  timeUp      Boolean   @default(false)
+  completedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  candidate Candidate @relation(fields: [candidateId], references: [id])
+  interview Interview @relation(fields: [interviewId], references: [id])
+
+  // one candidate can only attempt a given interview once
+  @@unique([candidateId, interviewId])
+}
